@@ -1,0 +1,19 @@
+{
+  "expected_feature_columns": [
+    "z1_S1(degC)",
+    "z1_S1(RH%)",
+    "z1_S1(lux)",
+    "z2_S1(degC)",
+    "z2_S1(RH%)",
+    "z2_S1(lux)",
+    "z4_S1(degC)",
+    "z4_S1(RH%)",
+    "z4_S1(lux)",
+    "z5_S1(degC)",
+    "z5_S1(RH%)",
+    "z5_S1(lux)",
+    "hour",
+    "dayofweek",
+    "month"
+  ]
+}

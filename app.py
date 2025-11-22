@@ -27,6 +27,7 @@ app.add_middleware(
         "http://127.0.0.1:3000",
         "http://localhost",
         "http://127.0.0.1",
+        "https://gorogrid-frontend-ccnqbr4d6-anghelo-aguirres-projects.vercel.app/",
     ],
     allow_credentials=True,
     allow_methods=["*"],

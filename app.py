@@ -28,6 +28,7 @@ app.add_middleware(
         "http://localhost",
         "http://127.0.0.1",
         "https://gorogrid-frontend-ccnqbr4d6-anghelo-aguirres-projects.vercel.app/",
+        "https://purple-bay-06c27bf10.3.azurestaticapps.net/",
     ],
     allow_credentials=True,
     allow_methods=["*"],

@@ -72,8 +72,8 @@
   </div>
 
   <script>
-    const API_BASE = (location.hostname === '127.0.0.1' || location.hostname === 'localhost')
-      ? 'http://127.0.0.1:8000'
+    const API_BASE = (location.hostname === '127.0.0.1' || location.hostname === 'localhost' || location.hostname === 'https://gorogrid-backend-ceembfhbdkfabahz.brazilsouth-01.azurewebsites.net/')
+      ? 'https://gorogrid-backend-ceembfhbdkfabahz.brazilsouth-01.azurewebsites.net:8000'
       : window.location.origin;
 
     const form = document.getElementById('frm');

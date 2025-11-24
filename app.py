@@ -12,6 +12,8 @@ from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware  # <-- NUEVO
 
+SUMMARY_CSV_PATH = os.getenv("SUMMARY_CSV_PATH", "data/dashboard_summary.csv")
+WEEKLY_CSV_PATH = os.getenv("WEEKLY_CSV_PATH", "data/weekly_consumption.csv")
 MODEL_PATH = os.getenv("MODEL_PATH", "modelo_rlm.pkl")
 SCHEMA_PATH = os.getenv("SCHEMA_PATH", "modelo_rlm_schema.json")
 MEDIANS_PATH = os.getenv("MEDIANS_PATH", "feature_medians.json")
@@ -27,8 +29,6 @@ app.add_middleware(
         "http://127.0.0.1:3000",
         "http://localhost",
         "http://127.0.0.1",
-        "https://gorogrid-frontend-ccnqbr4d6-anghelo-aguirres-projects.vercel.app/",
-        "https://purple-bay-06c27bf10.3.azurestaticapps.net/",
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -97,9 +97,12 @@ def add_time_features(df: pd.DataFrame) -> pd.DataFrame:
     if "Date" in df.columns and not pd.api.types.is_datetime64_any_dtype(df["Date"]):
         df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
     if "Date" in df.columns and pd.api.types.is_datetime64_any_dtype(df["Date"]):
-        if "hour" not in df.columns: df["hour"] = df["Date"].dt.hour
-        if "dayofweek" not in df.columns: df["dayofweek"] = df["Date"].dt.dayofweek
-        if "month" not in df.columns: df["month"] = df["Date"].dt.month
+        if "hour" not in df.columns:
+            df["hour"] = df["Date"].dt.hour
+        if "dayofweek" not in df.columns:
+            df["dayofweek"] = df["Date"].dt.dayofweek
+        if "month" not in df.columns:
+            df["month"] = df["Date"].dt.month
     return df
 
 def ensure_order(df: pd.DataFrame, expected: List[str]) -> pd.DataFrame:
@@ -165,6 +168,48 @@ def predict(payload: PredictPayload):
     return {"prediction": yhat}
 
 # =========================
+# Endpoint para métricas del dashboard
+# =========================
+@app.get("/dashboard-metrics")
+def dashboard_metrics():
+    """
+    Lee los CSV de resumen y de serie semanal para alimentar el dashboard.
+    Si en el futuro se usa base de datos, solo se cambia la lógica interna.
+    """
+    try:
+        if not os.path.exists(SUMMARY_CSV_PATH):
+            raise HTTPException(status_code=500, detail="No se encontró el CSV de resumen del dashboard.")
+
+        summary_df = pd.read_csv(SUMMARY_CSV_PATH)
+
+        if summary_df.empty:
+            raise HTTPException(status_code=500, detail="El CSV de resumen está vacío.")
+
+        # Tomamos la última fila por si luego guardas histórico
+        row = summary_df.iloc[-1]
+
+        weekly = None
+        if os.path.exists(WEEKLY_CSV_PATH):
+            weekly_df = pd.read_csv(WEEKLY_CSV_PATH)
+            if not weekly_df.empty:
+                weekly = weekly_df.to_dict(orient="records")
+
+        return {
+            "consumo_actual_kwh": float(row["consumo_actual_kwh"]),
+            "consumo_vs_mes_anterior_pct": float(row["consumo_vs_mes_anterior_pct"]),
+            "emisiones_actual_kg": float(row["emisiones_actual_kg"]),
+            "emisiones_vs_mes_anterior_pct": float(row["emisiones_vs_mes_anterior_pct"]),
+            "costo_actual_mxn": float(row["costo_actual_mxn"]),
+            "costo_vs_mes_anterior_pct": float(row["costo_vs_mes_anterior_pct"]),
+            "weekly": weekly,
+        }
+    except HTTPException:
+        # Relevantar las HTTPException que ya tienen código y mensaje
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error leyendo CSV para dashboard: {e}")
+
+# =========================
 # Página principal y estáticos
 # =========================
 @app.get("/", response_class=HTMLResponse)
@@ -174,7 +219,7 @@ def root():
         return FileResponse(index_path)
     return """
     <html><body style='font-family: Arial; text-align:center; padding-top:50px;'>
-    <h2>⚡ GoroGrid API local</h2>
+    <h2>GoroGrid API local</h2>
     <p>La API está activa.</p>
     <p>Visita <a href='/docs'>/docs</a> o abre el index en /static</p>
     </body></html>

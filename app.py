@@ -21,14 +21,6 @@ FEATURE_LIST_ENV = os.getenv("FEATURE_LIST")
 
 app = FastAPI(title="GoroGrid Floor7 API", version="1.3")
 
-print(f"SUMMARY_CSV_PATH: {SUMMARY_CSV_PATH}")
-print(f"WEEKLY_CSV_PATH: {WEEKLY_CSV_PATH}")
-print(f"MODEL_PATH: {MODEL_PATH}")
-print(f"SCHEMA_PATH: {SCHEMA_PATH}")
-print(f"MEDIANS_PATH: {MEDIANS_PATH}")
-print(f"FEATURE_LIST_ENV: {FEATURE_LIST_ENV}")
-
-
 # ===== CORS (para conectar desde http://localhost:3000) =====
 app.add_middleware(
     CORSMiddleware,
@@ -237,3 +229,4 @@ def root():
 
 # Nota: montamos los estáticos en /static para no interferir con /predict o /docs
 app.mount("/static", StaticFiles(directory="static", html=True), name="static")
+

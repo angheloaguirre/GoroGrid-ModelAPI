@@ -21,6 +21,14 @@ FEATURE_LIST_ENV = os.getenv("FEATURE_LIST")
 
 app = FastAPI(title="GoroGrid Floor7 API", version="1.3")
 
+print(f"SUMMARY_CSV_PATH: {SUMMARY_CSV_PATH}")
+print(f"WEEKLY_CSV_PATH: {WEEKLY_CSV_PATH}")
+print(f"MODEL_PATH: {MODEL_PATH}")
+print(f"SCHEMA_PATH: {SCHEMA_PATH}")
+print(f"MEDIANS_PATH: {MEDIANS_PATH}")
+print(f"FEATURE_LIST_ENV: {FEATURE_LIST_ENV}")
+
+
 # ===== CORS (para conectar desde http://localhost:3000) =====
 app.add_middleware(
     CORSMiddleware,
@@ -29,6 +37,8 @@ app.add_middleware(
         "http://127.0.0.1:3000",
         "http://localhost",
         "http://127.0.0.1",
+        "https://gorogrid-backend-ceembfhbdkfabahz.brazilsouth-01.azurewebsites.net/",
+        "https://purple-bay-06c27bf10.3.azurestaticapps.net/",
     ],
     allow_credentials=True,
     allow_methods=["*"],

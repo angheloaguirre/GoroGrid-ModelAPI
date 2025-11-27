@@ -24,14 +24,7 @@ app = FastAPI(title="GoroGrid Floor7 API", version="1.3")
 # ===== CORS (para conectar desde http://localhost:3000) =====
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-        "http://localhost",
-        "http://127.0.0.1",
-        "https://gorogrid-backend-ceembfhbdkfabahz.brazilsouth-01.azurewebsites.net/",
-        "https://purple-bay-06c27bf10.3.azurestaticapps.net/",
-    ],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -229,4 +222,5 @@ def root():
 
 # Nota: montamos los estáticos en /static para no interferir con /predict o /docs
 app.mount("/static", StaticFiles(directory="static", html=True), name="static")
+
 
